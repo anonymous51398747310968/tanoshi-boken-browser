@@ -7,6 +7,9 @@ from asset_audit import DataReader, walk, decode
 ROOT=Path(__file__).resolve().parent.parent
 DOCS=ROOT/'docs'
 manifest=json.loads((DOCS/'asset-manifest.json').read_text())
+player=(DOCS/'assets/player.js').read_text(encoding='utf-8')
+engine_hash=re.search(r'Tn=`([a-f0-9]{64})`',player)[1]
+assert hashlib.sha256((DOCS/'mkxp-z_libretro.js').read_bytes()).hexdigest()==engine_hash
 for name,asset in manifest.items():
     raw=gzip.decompress((DOCS/asset['file']).read_bytes())
     assert len(raw)==asset['size'],name

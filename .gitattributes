@@ -1,0 +1,7 @@
+*.gz binary
+# The unmodified engine loader is verified against its upstream byte hash.
+docs/mkxp-z_libretro.js -text
+*.py text eol=lf
+*.html text eol=lf
+*.md text eol=lf
+*.json text eol=lf

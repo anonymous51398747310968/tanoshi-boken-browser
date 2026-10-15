@@ -88,7 +88,7 @@ def main():
     html=html.replace('report(kind,args);','').replace("report('error',[message]);",'')
     html=html.replace('./assets/player.js','./boot.js')
     html=html.replace('同じブラウザ・同じURLで続きから遊べます。','同じブラウザ・同じURLで続きから遊べます。サイトデータの削除でセーブも消去されます。<br><a href="./credits.html" style="color:#bac7d7">クレジット・動作環境</a>')
-    html=html.replace('初回は少し時間がかかります。',f'初回の通信量は約{sum(v["transfer"] for v in manifest.values())/1024/1024:.0f}MBです。')
+    html=html.replace('初回は少し時間がかかります。',f'初回の通信量は約{sum(v["transfer"] for v in manifest.values())/1024/1024:.0f}MiBです。')
     (DOCS/'index.html').write_text(html,encoding='utf-8')
     (DOCS/'.nojekyll').write_text('')
     (DOCS/'asset-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
