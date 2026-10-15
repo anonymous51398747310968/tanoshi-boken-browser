@@ -1,0 +1,14 @@
+{
+  "tanoshi-boken.mkxpz": {
+    "file": "tanoshi-boken.mkxpz.1507f859c80c.gz",
+    "size": 105036805,
+    "transfer": 100881624,
+    "sha256": "1507f859c80c8a9ab267bf4febefb153af0f01cabf904cd955b5d6d0b1a319a8"
+  },
+  "mkxp-z_libretro.wasm": {
+    "file": "mkxp-z_libretro.wasm.9eb318ba1e86.gz",
+    "size": 42539967,
+    "transfer": 16379234,
+    "sha256": "9eb318ba1e8691fbf155d879c0f63df4a85cf295342a2ec93ad653b1636a8f7a"
+  }
+}
