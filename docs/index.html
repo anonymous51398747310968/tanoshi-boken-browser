@@ -21,10 +21,16 @@
   <p id="status" aria-live="polite">ゲームを読み込んでいます。初回の通信量は約112MiBです。</p>
   <footer><kbd>↑ ↓ ← →</kbd> 移動　 <kbd>Z / Enter</kbd> 決定　 <kbd>X / Esc</kbd> メニュー・戻る　 <kbd>Shift</kbd> ダッシュ<br>ゲーム内の「セーブ」で保存できます。同じブラウザ・同じURLで続きから遊べます。サイトデータの削除でセーブも消去されます。<br><a href="./credits.html" style="color:#bac7d7">クレジット・動作環境</a></footer>
   <pre id="error"></pre><div id="gamepad-target"></div>
+  <details id="graphics-diagnostics" style="width:min(100% - 40px,900px);margin:8px 0 24px;font-size:13px">
+    <summary style="cursor:pointer">起動できないとき・描画診断</summary>
+    <p><a href="./cloud-pc.html" style="color:#bac7d7">クラウドPCでの起動方法</a> · <a href="?diagnostics=1" style="color:#bac7d7">ゲームを読み込まずに診断する</a></p>
+    <p>診断結果はこの画面にだけ表示され、外部へ送信されません。</p>
+    <pre id="graphics-report" style="white-space:pre-wrap;overflow-wrap:anywhere">診断前</pre>
+  </details>
   <script>
     const statusText=document.getElementById('status');
     for(const kind of ['log','warn','error']){const original=console[kind];console[kind]=(...args)=>{original.apply(console,args);const fatal=args.find(v=>String(v).includes('BROWSER_GAME_ERROR:'));if(fatal)showError(fatal);};}
-    function showError(error){const message=String(error);if(message.includes('Reloading'))return;document.getElementById('error').style.display='block';document.getElementById('error').textContent=message;statusText.textContent='起動中にエラーが発生しました。';}
+    function showError(error){const message=String(error);if(message.includes('Reloading'))return;document.getElementById('error').style.display='block';document.getElementById('error').textContent=message;statusText.textContent='起動中にエラーが発生しました。';document.getElementById('graphics-diagnostics').open=true;}
     window.addEventListener('error',e=>showError(e.message));window.addEventListener('unhandledrejection',e=>showError(e.reason));
     window.addEventListener('game-started',()=>{statusText.textContent='ゲーム画面をクリックして操作できます。';document.getElementById('spinner-target').style.display='none';document.querySelector('canvas').focus();});
     document.getElementById('fullscreen').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.getElementById('stage').requestFullscreen();};

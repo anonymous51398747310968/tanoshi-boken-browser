@@ -1,7 +1,7 @@
 """Verify release integrity, reachable typed references, and static links."""
 from pathlib import Path
 import gzip, hashlib, io, json, re, zipfile
-from urllib.parse import unquote
+from urllib.parse import unquote, urlsplit
 from asset_audit import DataReader, walk, decode
 
 ROOT=Path(__file__).resolve().parent.parent
@@ -67,7 +67,7 @@ with zipfile.ZipFile(io.BytesIO(game)) as z:
 for path in DOCS.rglob('*.html'):
     for link in re.findall(r'(?:src|href)="([^"]+)"',path.read_text(encoding='utf-8')):
         if link.startswith(('http:','https:','data:','#')):continue
-        assert (path.parent/unquote(link.split('#')[0])).exists(),(path,link)
+        assert (path.parent/unquote(urlsplit(link).path)).exists(),(path,link)
 html=(DOCS/'index.html').read_text(encoding='utf-8')
 assert '/client-log' not in html
 assert not re.search(r'@font-face', (DOCS/'assets/index-lP0ZUypO.css').read_text())

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>クラウドPCでの起動方法 — 楽しい冒険を始まる</title>
+<style>body{max-width:850px;margin:32px auto;padding:0 24px;background:#141b24;color:#edf0f5;font:16px/1.8 system-ui,sans-serif}a{color:#b5d6ff}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#223043;padding:16px;border-radius:8px}h1{font-size:24px}h2{font-size:19px}</style>
+<h1>クラウドPCでの起動方法</h1>
+<p>GPUを利用できないLinuxの仮想PCでは、ChromiumのCPU描画（SwiftShader）を指定して起動できます。通常起動でWebGLを作れない場合に試す方法です。ゲームのWebページからブラウザの起動設定を変更することはできません。</p>
+<h2>Debian・Chromium・X11</h2>
+<p>クラウドPCのデスクトップでターミナルを開き、一般ユーザーで次を実行してください。CPU描画用の専用ウィンドウが開きます。普段のブラウザは終了する必要がありません。</p>
+<pre>chromium --user-data-dir="$HOME/.local/share/tanoshi-boken/chromium-cpu" \
+  --ozone-platform=x11 --use-gl=angle --use-angle=swiftshader \
+  --new-window 'https://anonymous51398747310968.github.io/tanoshi-boken-browser/'</pre>
+<p><a href="./play-cloud-linux.sh" download>同じ起動設定のシェルスクリプトをダウンロード</a>し、<code>sh play-cloud-linux.sh</code> で起動することもできます。</p>
+<p>今後も同じ方法で起動するとセーブを引き継ぎます。普段のブラウザのセーブは専用プロファイルには自動移行されません。CPU描画はGPU描画より遅くなることがあります。ゲーム用のウィンドウとして使用してください。</p>
+<h2>まだ起動できない場合</h2>
+<p>新しいウィンドウで <a href="./?diagnostics=1">描画診断</a> を開き、結果と <code>chrome://gpu</code> の「Graphics Feature Status」「Problems Detected」を確認してください。組織のポリシーでWebGLが無効になっている場合や、SwiftShaderライブラリがない場合は、この起動指定だけでは解決しません。</p>
+<p>現行のDebian 13の <code>chromium-common</code> はSwiftShaderを含みます。ファイルが不足している場合は、管理者にChromium本体と同じ版の <code>chromium-common</code> の導入を依頼してください。診断結果は外部に自動送信されません。</p>
+<p>このランチャーはブラウザのサンドボックスを有効のまま使用します。<code>--no-sandbox</code> や <code>--disable-web-security</code> は不要です。</p>
+<p>参考：<a href="https://chromium.googlesource.com/chromium/src/+/main/docs/gpu/swiftshader.md">Chromium公式のSwiftShader起動方法</a>、<a href="https://packages.debian.org/trixie/amd64/chromium-common/filelist">Debianの同梱ファイル一覧</a>。</p>
+<p><a href="./">ゲームへ戻る</a></p></html>

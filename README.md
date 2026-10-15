@@ -6,6 +6,10 @@
 
 PCの最新版Chrome / Edgeを推奨。方向キーで移動、Z / Enterで決定、X / Escでメニュー・戻る、Shiftでダッシュ。
 
+GPUのないDebian/X11クラウドPCでWebGL初期化が失敗するときは、[CPU描画でのChromium起動方法](https://anonymous51398747310968.github.io/tanoshi-boken-browser/cloud-pc.html) を参照してください。WebページからブラウザのGPU設定を有効化することはできません。専用プロファイルで `--use-gl=angle --use-angle=swiftshader` を指定します。
+
+ページ起動時にメインスレッドとWorker内のWebGL 2生成・描画を確認します。どちらかが失敗した場合は大容量データをダウンロードせず診断を表示します。`?diagnostics=1` では診断だけを実行できます。結果は外部送信しません。
+
 ## 公開用の処理
 
 - 未使用BGM・重複音源・標準素材を整理。全マップとデータベース、スクリプトの文字列参照を確認。動的に参照するカスタム画像・戦闘アニメーション・SEは保守的に保持。
