@@ -1,18 +1,32 @@
-name: Inspect silent Canvas build data
+name: Build silent Canvas edition
 on:
   push:
     paths:
+      - "tools/silent_build.py"
       - "tools/silent_inspect.py"
       - ".github/workflows/import-silent.yml"
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  inspect:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect bundled game source
+      - name: Install image tools
+        run: python3 -m pip install --break-system-packages pillow
+      - name: Build graphics and event data
+        run: python3 tools/silent_build.py
+      - name: Check generated assets
         shell: bash
-        run: python3 tools/silent_inspect.py
+        run: |
+          du -sh docs/silent
+          find docs/silent -type f | wc -l
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('docs/silent/data.json').read_text())
+          print('START',d['db']['System']['start_map_id'],d['db']['System']['start_x'],d['db']['System']['start_y'])
+          print('SAMPLE EVENT',d['maps']['3']['events'])
+          PY
