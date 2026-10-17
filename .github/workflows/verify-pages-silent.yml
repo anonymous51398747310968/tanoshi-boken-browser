@@ -1,0 +1,55 @@
+name: Verify silent edition on public GitHub Pages
+
+on:
+  push:
+    paths:
+      - .github/workflows/verify-pages-silent.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-public:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check public endpoints and payload
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import time
+          import urllib.request
+          import json
+          import re
+          root='https://anonymous51398747310968.github.io/tanoshi-boken-browser/'
+          def download(name):
+              url=root+name
+              last=None
+              for attempt in range(12):
+                  try:
+                      req=urllib.request.Request(url,headers={'User-Agent':'TanoshiSilentSmoke/1.0','Cache-Control':'no-cache'})
+                      with urllib.request.urlopen(req,timeout=20) as response:
+                          assert response.status==200,(name,response.status)
+                          body=response.read()
+                          print(name or '<root>', response.status,len(body),response.headers.get('content-type'),flush=True)
+                          return body
+                  except Exception as e:
+                      last=e
+                      time.sleep(3)
+              raise RuntimeError(f'{name} not served: {last}')
+          index=download('').decode('utf-8')
+          assert 'silent/' in index,index[:300]
+          html=download('silent/').decode('utf-8')
+          assert 'Canvas 2D' in html and 'app.js' in html and 'WebGL' in html
+          js=download('silent/app.js').decode('utf-8')
+          assert 'requestAnimationFrame' in js and 'getContext("2d"' in js
+          assert not re.search(r'\bnew Audio\b|\bAudioContext\b|\.getContext\(["\x27]webgl',js)
+          db=json.loads(download('silent/data.json'))
+          assert len(db['maps'])==13
+          assert '2' in db['maps']
+          map_image=download('silent/'+db['maps']['2']['bg'])
+          assert map_image[:4]==b'RIFF' and map_image[8:12]==b'WEBP'
+          assert download('legacy.html').startswith(b'<!doctype html>')
+          print('PUBLIC GITHUB PAGES PASS: silent, graphics, game data, legacy')
+          PY
