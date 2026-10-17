@@ -206,6 +206,20 @@ def main():
                     top=(layer==2 and tid<len(flags) and (flags[tid]&0x10)!=0)
                     if top: fg.alpha_composite(tile,(x*32,y*32))
                     else: bg.alpha_composite(tile,(x*32,y*32))
+        # Event graphics referencing tiles are not part of the static map.
+        # Export them separately so event page changes render without rebuilding maps.
+        for e in m.get("events",{}).values():
+            for pg in e.get("pages",[]):
+                tid=int(pg.get("graphic",{}).get("tile_id",0) or 0)
+                if tid<=0: continue
+                key="EventTile|"+str(m["tileset_id"])+"|"+str(tid)
+                if key in OUT["sprites"]: continue
+                tile=cuts.get(tid)
+                if tile is None: tile=compose_tile(tid,sheets,z,cache)
+                if tile is None: continue
+                filename=hashlib.sha256(key.encode()).hexdigest()[:16]+".webp"
+                tile.save(GRAPHICS/filename,"WEBP",lossless=True,method=5)
+                OUT["sprites"][key]="img/"+filename
         bgname=f"Map{num:03d}.webp"
         bg.convert("RGB").save(MAPS/bgname,"WEBP",quality=89,method=5)
         upper=None
