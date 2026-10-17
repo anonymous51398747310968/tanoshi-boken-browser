@@ -3,7 +3,8 @@ on:
   push:
     paths:
       - "tools/silent_build.py"
-      - "tools/silent_inspect.py"
+      - "docs/silent/app.js"
+      - "docs/silent/index.html"
       - ".github/workflows/import-silent.yml"
   workflow_dispatch:
 permissions:
@@ -14,11 +15,13 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: node --check docs/silent/app.js
       - name: Install image tools
         run: python3 -m pip install --break-system-packages pillow
       - name: Build graphics and event data
         run: python3 tools/silent_build.py
-      - name: Check generated assets
+      - name: Check output
         shell: bash
         run: |
           du -sh docs/silent
@@ -27,6 +30,11 @@ jobs:
           import json
           from pathlib import Path
           d=json.loads(Path('docs/silent/data.json').read_text())
-          print('START',d['db']['System']['start_map_id'],d['db']['System']['start_x'],d['db']['System']['start_y'])
-          print('SAMPLE EVENT',d['maps']['3']['events'])
+          print('Map count',len(d['maps']))
+          print('Game start:',d['db']['System']['start_map_id'],d['db']['System']['start_x'],d['db']['System']['start_y'])
+          print('Map003 event triggers:',[(e['id'],[p['trigger'] for p in e['pages']]) for e in d['maps']['3']['events'].values()])
+          print('Sprites',len(d['sprites']))
+          print('Audio asset count',len(list(Path('docs/silent').rglob('*.ogg'))))
+          assert len(d['maps'])==13
+          assert any(p['trigger']==3 for e in d['maps']['3']['events'].values() for p in e['pages'])
           PY
