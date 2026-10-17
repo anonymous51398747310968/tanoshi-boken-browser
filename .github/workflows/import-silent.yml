@@ -1,35 +1,18 @@
-name: Inspect Canvas 2D site for GitHub Pages import
-
+name: Inspect silent Canvas build data
 on:
   push:
     paths:
+      - "tools/silent_inspect.py"
       - ".github/workflows/import-silent.yml"
   workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
   inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
-      - name: Check available build files
+      - uses: actions/checkout@v4
+      - name: Inspect bundled game source
         shell: bash
-        run: |
-          python3 - <<'PY'
-          from urllib.request import Request, urlopen
-          import re
-          base = "https://tanoshi-boken-silent.guest4653.chatgpt.site/"
-          for url in (base, base+"index.html"):
-              try:
-                  req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
-                  with urlopen(req, timeout=30) as response:
-                      data = response.read(524288)
-                      print("URL", url, "status", response.status, "mime", response.headers.get("content-type"), "bytes", len(data))
-                      s = data.decode("utf-8","replace")
-                      print(s[:16000])
-                      print("REFERENCES:", sorted(set(re.findall(r'(?:src|href)=[\'\"]([^\'\"]+)',s))))
-              except Exception as exc:
-                  print("FETCH ERROR",repr(exc))
-          PY
+        run: python3 tools/silent_inspect.py
