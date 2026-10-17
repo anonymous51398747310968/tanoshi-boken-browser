@@ -1,43 +1,11 @@
 <!doctype html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#141b24">
-  <meta name="application-name" content="tanoshi-boken-browser">
-  <title>楽しい冒険を始まる</title>
-  <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./assets/index-lP0ZUypO.css">
-  <style>
-    *{box-sizing:border-box}body{margin:0;background:#141b24;color:#edf0f5;font-family:system-ui,"Yu Gothic",sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-    header{width:min(100% - 40px,1040px);padding:22px 0 16px;display:flex;align-items:center;justify-content:space-between;gap:20px}h1{font-size:21px;margin:0 0 5px;font-weight:600}header p{margin:0;font-size:12px;color:#adb6c7}.actions{display:flex;gap:8px}button{font:inherit;font-size:13px;color:#eff3fa;background:#2c3c51;border:1px solid #50627b;border-radius:8px;padding:9px 14px;cursor:pointer}button:hover{background:#3d526e}button:focus-visible{outline:3px solid #a9d2ff;outline-offset:3px}
-    #stage{position:relative;width:min(calc(100vw - 40px),calc((100dvh - 180px)*1.3077),1040px);aspect-ratio:544/416;background:#000;border:1px solid #354153;border-radius:8px;overflow:hidden;box-shadow:0 18px 55px #0005}canvas{width:100%;height:100%;display:block;object-fit:contain;outline:0}#spinner-target{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none}#progressbar-target{display:none;width:80px;height:80px}#user-activation-prompt{display:none;font-size:20px;padding:20px;border-radius:12px;background:#2c3c51;cursor:pointer;pointer-events:auto}#user-activation-prompt::before{content:'▶　クリックして冒険をはじめる'}#status{color:#bac7d7;font-size:13px;margin:13px 20px 4px;text-align:center}footer{color:#9baabd;font-size:12px;line-height:1.9;text-align:center;padding:5px 20px 16px}kbd{font-family:inherit;color:#e3eaf2}#error{display:none;white-space:pre-wrap;color:#ffd2b9;max-width:800px;padding:15px}#stage:fullscreen{width:100vw;height:100vh;border:0;border-radius:0;aspect-ratio:auto}#gamepad-target{z-index:4}.Gamepad-controller.is-active{box-shadow:0 0 30px currentColor}
-    @media(max-width:600px){header{padding:14px 0}h1{font-size:16px}#stage{width:100vw;border-radius:0}.actions button{padding:8px}footer{font-size:11px}}
-  </style>
-</head>
-<body>
-  <header><div><h1>楽しい冒険を始まる</h1><p>マクダレン 作 · ブラウザ版</p></div><div class="actions"><button id="fullscreen">全画面</button></div></header>
-  <main id="stage"><canvas id="nostalgist-canvas" tabindex="0" aria-label="ゲーム画面"></canvas><div id="spinner-target"><div id="progressbar-target"></div><p id="user-activation-prompt" role="button" tabindex="0" aria-label="クリックして冒険をはじめる"></p></div></main>
-  <p id="status" aria-live="polite">ゲームを読み込んでいます。初回の通信量は約112MiBです。</p>
-  <footer><kbd>↑ ↓ ← →</kbd> 移動　 <kbd>Z / Enter</kbd> 決定　 <kbd>X / Esc</kbd> メニュー・戻る　 <kbd>Shift</kbd> ダッシュ<br>ゲーム内の「セーブ」で保存できます。同じブラウザ・同じURLで続きから遊べます。サイトデータの削除でセーブも消去されます。<br><a href="./credits.html" style="color:#bac7d7">クレジット・動作環境</a></footer>
-  <pre id="error"></pre><div id="gamepad-target"></div>
-  <details id="graphics-diagnostics" style="width:min(100% - 40px,900px);margin:8px 0 24px;font-size:13px">
-    <summary style="cursor:pointer">起動できないとき・描画診断</summary>
-    <p><a href="./cloud-pc.html" style="color:#bac7d7">クラウドPCでの起動方法</a> · <a href="?diagnostics=1" style="color:#bac7d7">ゲームを読み込まずに診断する</a></p>
-    <p>診断結果はこの画面にだけ表示され、外部へ送信されません。</p>
-    <pre id="graphics-report" style="white-space:pre-wrap;overflow-wrap:anywhere">診断前</pre>
-  </details>
-  <script>
-    const statusText=document.getElementById('status');
-    for(const kind of ['log','warn','error']){const original=console[kind];console[kind]=(...args)=>{original.apply(console,args);const fatal=args.find(v=>String(v).includes('BROWSER_GAME_ERROR:'));if(fatal)showError(fatal);};}
-    function showError(error){const message=String(error);if(message.includes('Reloading'))return;document.getElementById('error').style.display='block';document.getElementById('error').textContent=message;statusText.textContent='起動中にエラーが発生しました。';document.getElementById('graphics-diagnostics').open=true;}
-    window.addEventListener('error',e=>showError(e.message));window.addEventListener('unhandledrejection',e=>showError(e.reason));
-    window.addEventListener('game-started',()=>{statusText.textContent='ゲーム画面をクリックして操作できます。';document.getElementById('spinner-target').style.display='none';document.querySelector('canvas').focus();});
-    document.getElementById('fullscreen').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.getElementById('stage').requestFullscreen();};
-    // Map common RPG Maker alternatives to the reference player's Z/X controls.
-    for(const eventType of ['keydown','keyup'])window.addEventListener(eventType,e=>{if(!e.isTrusted||!['Enter','Escape'].includes(e.key)||e.target.tagName==='BUTTON')return;e.preventDefault();e.stopImmediatePropagation();document.querySelector('canvas').dispatchEvent(new KeyboardEvent(eventType,{key:e.key==='Enter'?'z':'x',code:e.key==='Enter'?'KeyZ':'KeyX',keyCode:e.key==='Enter'?90:88,which:e.key==='Enter'?90:88,bubbles:true}));},true);
-    window.addEventListener('keydown',e=>{if(e.target.tagName==='CANVAS'&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();});
-  </script>
-  <script type="module" src="./boot.js"></script>
-</body>
-</html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="0;url=./silent/">
+<title>楽しい冒険を始まる — 無音版</title>
+<script>location.replace("./silent/");</script>
+</head><body style="background:#121c2c;color:#f4ead8;font-family:system-ui;text-align:center;margin:15vh auto">
+<h1>楽しい冒険を始まる</h1>
+<p><a style="color:#fbe0a1" href="./silent/">無音版で冒険を始める</a></p>
+<p><a style="color:#acbddb" href="./legacy.html">従来のWebGL版</a></p>
+</body></html>
