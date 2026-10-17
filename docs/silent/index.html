@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111926">
+<meta name="description" content="楽しい冒険を始まる / 原作マクダレンの短編RPG・Canvas 2D・無音版">
+<title>楽しい冒険を始まる — 無音ブラウザ版</title>
+<style>
+:root{color-scheme:dark;--bg:#0e1520;--gold:#f4dbac;--border:#546b86}
+*{box-sizing:border-box}body{margin:0;min-height:100dvh;background:radial-gradient(ellipse at 50% -15%,#35425b 0,#111925 47%,#0b1019 100%);color:#ecf0f6;font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;display:flex;align-items:center;flex-direction:column}
+header{width:min(100% - 20px,1100px);padding:14px 0 12px;display:flex;gap:14px;align-items:center;justify-content:space-between}h1{font-weight:700;font-size:clamp(17px,3vw,24px);margin:0;color:#fff0ce}header p{font-size:12px;color:#c2cedc;margin:4px 0 0}
+button{font:inherit;background:#253952;color:#fff3df;border:1px solid #607996;border-radius:8px;padding:8px 14px;cursor:pointer;touch-action:manipulation}button:focus-visible{outline:3px solid #f8deac;outline-offset:3px}button:hover{background:#34516c}button:active{background:#465f85}
+#game-wrap{width:min(98vw,1000px,calc((100dvh - 164px)*1.30769));max-width:1000px;aspect-ratio:544/416;position:relative;background:#080f1b;border:3px solid #65738c;box-shadow:0 20px 65px #0009;border-radius:9px;overflow:hidden}
+canvas{width:100%;height:100%;display:block;image-rendering:pixelated;outline:0;touch-action:none;cursor:crosshair}
+#game-wrap:fullscreen{width:100vw;height:100vh;max-width:none;aspect-ratio:auto;border:0;border-radius:0;display:grid;place-content:center;background:#000}
+#game-wrap:fullscreen canvas{height:min(100vh,calc(100vw*416/544));width:min(100vw,calc(100vh*544/416))}
+#status{font-size:12px;min-height:1.6em;color:#b5c2d5;text-align:center;padding:8px 10px}
+footer{text-align:center;color:#b4c1d2;font-size:12px;line-height:1.9;padding:0 14px 10px}a{color:#e0c895}
+#controls{display:flex;justify-content:space-between;gap:8px;width:min(100% - 20px,650px);align-items:center;touch-action:none}
+#controls .dpad{display:grid;grid-template-columns:repeat(3,47px);grid-template-rows:repeat(2,43px);gap:4px}
+#controls .dpad button{padding:0;font-size:20px}#controls .dpad .up{grid-column:2}
+#controls .actions{display:flex;gap:8px}#controls .actions button{min-height:55px;min-width:62px;font-weight:700}
+#controls[hidden]{display:none}
+@media(pointer:coarse){#game-wrap{width:min(100vw,800px);border-radius:0}#controls{display:flex!important;padding-top:8px}header{padding:8px 12px}footer{font-size:11px}}
+@media(max-height:660px){header{padding:5px 10px}#status{padding:3px}#game-wrap{width:min(94vw,calc((100dvh - 125px)*1.30769))}}
+</style></head>
+<body>
+<header><div><h1>楽しい冒険を始まる</h1><p>マクダレン 作 · Canvas 2D 無音版 · WebGL / GPU 不要</p></div><div><button id="fullscreen">全画面</button> <button id="touchToggle" aria-pressed="false">画面ボタン</button></div></header>
+<main id="game-wrap"><canvas id="game" width="544" height="416" tabindex="0" aria-label="楽しい冒険を始まる ゲーム画面"></canvas></main>
+<div id="status" aria-live="polite">読み込み中…</div>
+<div id="controls" hidden aria-label="ゲーム操作ボタン">
+<div class="dpad"><button class="up" data-key="ArrowUp" aria-label="上">▲</button><button data-key="ArrowLeft" aria-label="左">◀</button><button data-key="ArrowDown" aria-label="下">▼</button><button data-key="ArrowRight" aria-label="右">▶</button></div>
+<div class="actions"><button data-key="Shift" aria-label="ダッシュ">走</button><button data-key="Escape" aria-label="戻る・メニュー">戻る</button><button data-key="Enter" aria-label="決定">決定</button></div></div>
+<footer>↑↓←→ 移動　Z / Enter 決定　X / Esc メニュー　Shift ダッシュ<br>
+ブラウザ内に自動保存。メニューから手動保存・復元、セーブの書き出しもできます。音は鳴りません。<br>
+<a href="../original-readme.txt">原作について</a> · <a href="../credits.html">素材・権利情報</a> · <a href="../legacy.html">従来のWebGL版</a></footer>
+<script src="./app.js" defer></script>
+</body></html>
