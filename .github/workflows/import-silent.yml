@@ -21,6 +21,14 @@ jobs:
         run: python3 -m pip install --break-system-packages pillow
       - name: Build graphics and event data
         run: python3 tools/silent_build.py
+      - name: Install browser test dependency
+        run: python3 -m pip install --break-system-packages selenium
+      - name: Test GPU-disabled Chrome browser game
+        shell: bash
+        run: |
+          python3 -m http.server 8766 --directory docs >/tmp/server.log 2>&1 &
+          sleep 2
+          python3 tools/silent_browser_test.py
       - name: Check output
         shell: bash
         run: |
