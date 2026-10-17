@@ -199,7 +199,7 @@ function faceTarget(){
 }
 function encounterStep(){
  const m=currentMap(),ls=arr(m?.encounters);if(!ls.length||busy)return;
- if(G.armors["30"]>0 && G.party.some(a=>arr(actor(a).equips).includes(30)))return;
+ if(G.party.some(a=>arr(actor(a).equips).includes(30)))return;
  G.encounter=(G.encounter||0)+1;
  if(G.encounter<(m.encounterStep||30)/2+rand(2))return;
  G.encounter=0;
@@ -319,13 +319,14 @@ function compare(a,b,op){return op==="=="?a==b:op==="!="?a!=b:op===">="?a>=b:op=
 function branchCondition(p,eventId){
  const type=p[0],a=p[1],b=p[2];
  if(type===0)return !!G.switches[a]===(b===0);
- if(type===1)return compare(variable(a),b===0?variable(p[3]):p[3],["==",">=", "<=",">","<","!="][p[4]||0]||"==");
+ if(type===1)return compare(variable(a),b===0?p[3]:variable(p[3]),["==",">=", "<=",">","<","!="][p[4]||0]||"==");
  if(type===2)return !!G.self[selfKey(eventId,a)]===(b===0);
  if(type===4)return G.party.includes(a);
  if(type===8)return (G.items[a]||0)>0;
  if(type===9)return (G.weapons[a]||0)>0;
  if(type===10)return (G.armors[a]||0)>0;
  if(type===11)return keys.has(["ArrowDown","ArrowLeft","ArrowRight","ArrowUp"][a]||"");
+ if(type===6){const t=a===-1?G.dir:posFor(eventById(a)||{id:0,x:0,y:0}).dir;return Number(t)===Number(b)}
  if(type===12)return testRuby(String(a));
  return false;
 }
@@ -381,6 +382,7 @@ async function runEvent(event,p=pageFor(event),options={}){
  try{
   const list=arr(p.list),id=event.id;
   let choice={indent:-1,selected:-1},battleChoice={indent:-1,result:0};
+  const loops=[];
   for(let i=0;i<list.length;i++){
    if(!G||mode==="title"||mode==="gameover")break;
    const [code,indent,params]=[list[i].code,list[i].indent,arr(list[i].parameters)],v=params;
@@ -399,6 +401,9 @@ async function runEvent(event,p=pageFor(event),options={}){
    else if(code===403){
     if(choice.selected!==-1)i=jumpPast(list,i,indent,[404])-1;
    }
+   else if(code===112){loops.push({index:i,indent})}
+   else if(code===113){const last=loops.pop();if(last)i=jumpPast(list,i,last.indent,[413])}
+   else if(code===413){const last=loops[loops.length-1];if(last&&last.indent===indent)i=last.index;}
    else if(code===111){
     if(!branchCondition(v,id))i=jumpPast(list,i,indent,[411,412])-1;
    }
@@ -852,10 +857,11 @@ function drawSprite(category,name,index,dir,x,y,pattern=1){
  const dx=Math.round(x+(32-sw)/2),dy=Math.round(y+32-sh);
  ctx.drawImage(pic,sx,sy,sw,sh,dx,dy,sw,sh);
 }
+function drawMapPart(img,cam){if(!img)return;const sx=Math.floor(cam.x),sy=Math.floor(cam.y),w=Math.min(W,img.width-sx),h=Math.min(H,img.height-sy);if(w>0&&h>0)ctx.drawImage(img,sx,sy,w,h,0,0,w,h)}
 function drawMap(){
  const m=currentMap();if(!m)return;
  const cam=camera();ctx.fillStyle="#101a2c";ctx.fillRect(0,0,W,H);
- const ground=image(m.bg);if(ground)ctx.drawImage(ground,-Math.floor(cam.x),-Math.floor(cam.y));
+ const ground=image(m.bg);if(ground)drawMapPart(ground,cam);
  else {ctx.fillStyle="#263b36";for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++){
    ctx.fillRect(x*32-cam.x+2,y*32-cam.y+2,28,28)
  }}
@@ -878,7 +884,7 @@ function drawMap(){
   if(e.tile){let pic=image(e.tile);if(pic)ctx.drawImage(pic,x,y)}
   else drawSprite(e.cat,e.name,e.index,e.dir,x,y,e.pattern);
  }
- const upper=image(m.upper);if(upper)ctx.drawImage(upper,-Math.floor(cam.x),-Math.floor(cam.y));
+ const upper=image(m.upper);if(upper)drawMapPart(upper,cam);
  ctx.fillStyle="rgba(9,21,37,0.73)";ctx.fillRect(7,5,Math.min(W-14,300),28);
  print(m.name,17,9,15,"#f7eccf", "left",true);
  print(currency(G.gold),W-12,8,15,"#fff2ba","right");
